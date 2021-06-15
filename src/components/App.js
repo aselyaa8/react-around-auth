@@ -20,9 +20,10 @@ function App() {
   const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [isAddPlaceModalOpen, setAddPlaceModalOpen] = useState(false);
   const [isEditAvatarModalOpen, setEditAvatarModalOpen] = useState(false);
-  const [isConfirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
+  // const [isConfirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
-  const [deletingCard, setDeletingCard] = useState({});
+  // const [deleteCard, setDeleteCard] = useState('')
+  const [confirmDeletePopup, setConfirmDeletePopup] = useState({isOpen: false, id: ''})
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
@@ -84,9 +85,8 @@ function App() {
     setEditAvatarModalOpen(false);
     setEditProfileModalOpen(false);
     setAddPlaceModalOpen(false);
-    setConfirmDeleteModalOpen(false);
+    setConfirmDeletePopup({ isOpen: false, id: null })
     setSelectedCard({});
-    setDeletingCard({});
   }
 
   function handleCardClick({ name, link }) {
@@ -112,21 +112,25 @@ function App() {
   }
 
   function handleCardDelete(card) {
-    setDeletingCard(card);
-    setConfirmDeleteModalOpen(true);
+    console.log(card);
+    setConfirmDeletePopup({ isOpen: true, id: card._id })
   }
 
   function handleCardDeleteConfirm() {
-    console.log(deletingCard._id);
-    api.deleteCard(deletingCard._id).then(() => {
-      setCards(cards.filter((c) => {
-        return c._id !== deletingCard._id;
-      }));
-      console.log("Successfull deletion")
-      handleCloseAllModals();
-    }).catch((err) => {
-      console.log(err);
-    });
+    console.log(confirmDeletePopup);
+    if (confirmDeletePopup.isOpen && confirmDeletePopup.id) {
+      api.deleteCard(confirmDeletePopup.id).then(() => {
+        setCards(cards.filter((c) => {
+          return c._id !== confirmDeletePopup.id;
+        }));
+        console.log("Successfull deletion")
+        handleCloseAllModals();
+      }).catch((err) => {
+        console.log(err);
+      });
+    } else {
+      return
+    }
   }
 
   function handleAddPlace(card) {
@@ -187,7 +191,7 @@ function App() {
         <EditAvatarPopup isOpen={isEditAvatarModalOpen} onClose={handleCloseAllModals} onUpdateUserAvatar={handleUpdateUserAvatar} />
         <AddPlacePopup isOpen={isAddPlaceModalOpen} onClose={handleCloseAllModals} onAddPlace={handleAddPlace} />
         <ImagePopup card={selectedCard} onClose={handleCloseAllModals} />
-        <ConfirmPopup isOpen={isConfirmDeleteModalOpen} onClose={handleCloseAllModals} handleCardDeleteConfirm={handleCardDeleteConfirm} />
+        <ConfirmPopup isOpen={confirmDeletePopup.isOpen} onClose={handleCloseAllModals} handleCardDeleteConfirm={handleCardDeleteConfirm} />
       </div>
     </CurrentUserContext.Provider>
   );
