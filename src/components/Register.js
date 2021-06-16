@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import * as auth from '../utils/auth';
 import InfoTooltip from './InfoTooltip';
+import success from '../images/success.svg';
+import failed from '../images/union.svg';
 
 class Register extends React.Component {
   constructor(props) {
@@ -11,9 +13,11 @@ class Register extends React.Component {
       email: '',
       password: '',
       confirmPassword: '',
+      showModal: false,
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClose = this.handleClose.bind(this);
   }
 
   handleSubmit(e) {
@@ -21,28 +25,44 @@ class Register extends React.Component {
     if (this.state.password === this.state.confirmPassword) {
       auth.register(this.state.email, this.state.password).then((res) => {
         if (res) {
-          this.setState({registered: true}, ()=>{
-            this.props.history.push('/');
-          })
-
+          this.setState({ registered: true, showModal: true });
         } else {
-          console.log('Something went wrong.');
+          this.setState({ showModal: true });
         }
       });
     }
-
   }
+
   handleChange(e) {
     const { name, value } = e.target;
     this.setState({
       [name]: value
     });
   }
-  handleClose(){
-    this.setState({registered: false})
+
+  handleClose() {
+    if (this.state.showModal && this.state.registered) {
+      this.setState({ showModal: false }, () => {
+        this.props.history.push('/signin');
+      })
+    } else {
+      this.setState({ showModal: false });
+    }
   }
 
   render() {
+
+    let message;
+    let imgSrc;
+
+    if (this.state.showModal && this.state.registered) {
+      message = 'Success! You have now been registered.'
+      imgSrc = success;
+    } else if (this.state.showModal) {
+      message = 'Oops, something went wrong! Please try again.'
+      imgSrc = failed;
+    }
+
     return (
       <div className="login">
         <p className="login__heading">
@@ -57,7 +77,7 @@ class Register extends React.Component {
           </div>
         </form>
         <p className="login__text">Already a member? Log in here!</p>
-        {this.state.registered && <InfoTooltip onClose={this.handleClose}/>}
+        {this.state.showModal && <InfoTooltip onClose={this.handleClose} message={message} imgSrc={imgSrc} />}
       </div>
     )
   }

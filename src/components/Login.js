@@ -12,6 +12,7 @@ class Login extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
   handleSubmit(e) {
     e.preventDefault();
     if (!this.state.email || !this.state.password) {
@@ -21,8 +22,6 @@ class Login extends React.Component {
       .then((data) => {
         if (data.token) {
           this.setState({ email: '', password: '' }, () => {
-            console.log()
-            console.log("Handle Login")
             this.props.handleLogin();
             this.props.history.push('/');
           })
@@ -30,12 +29,14 @@ class Login extends React.Component {
       })
       .catch(err => console.log(err));
   }
+
   handleChange(e) {
     const { name, value } = e.target;
     this.setState({
       [name]: value
     });
   }
+
   render() {
 
     return (

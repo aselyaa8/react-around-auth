@@ -5,7 +5,8 @@ export const register = (email, password) => {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      // 'Content-Security-Policy': default-src 'self'; script-src 'self' https://register.nomoreparties.co;,
     },
     body: JSON.stringify({
       email,
@@ -13,34 +14,26 @@ export const register = (email, password) => {
     })
   }).then((response) => {
     return response.json();
-  })
-    .then((res) => {
-      console.log('hello')
-      console.log(res)
-      return res;
-    })
-    .catch((err) => console.log(err));
+  }).then((res) => {
+    return res;
+  }).catch((err) => console.log(err));
 };
 
 export const authorize = (email, password) => {
-  console.log("Authorize", email, password)
   return fetch(`${BASE_URL}/signin`, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({password, email})
-  })
-  .then((response => response.json()))
-  .then((data) => {
-    console.log("Token:", data)
-    if (data.token){
-      localStorage.setItem('token', data.token);
-      return data;
-    }
-  })
-  .catch(err => console.log(err))
+    body: JSON.stringify({ password, email })
+  }).then((response => response.json()))
+    .then((data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        return data;
+      }
+    }).catch(err => console.log(err))
 };
 
 export const checkToken = (token) => {
@@ -52,8 +45,6 @@ export const checkToken = (token) => {
       'Authorization': `Bearer ${token}`,
     }
   })
-  .then(res => res.json())
-  .then(data => data)
+    .then(res => res.json())
+    .then(data => data)
 }
-
-

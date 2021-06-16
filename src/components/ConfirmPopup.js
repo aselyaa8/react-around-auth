@@ -3,7 +3,8 @@ import React from 'react'
 
 function ConfirmPopup(props) {
   const modalClass = props.isOpen ? 'modal_opened' : '';
-  function handleDeleteConfirmClick() {
+  function handleDeleteConfirmClick(e) {
+    e.preventDefault();
     props.handleCardDeleteConfirm()
   }
   return (

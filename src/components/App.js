@@ -13,17 +13,15 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-import ConfirmPopup from './ConfirmPopup'
+import ConfirmPopup from './ConfirmPopup';
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [isAddPlaceModalOpen, setAddPlaceModalOpen] = useState(false);
   const [isEditAvatarModalOpen, setEditAvatarModalOpen] = useState(false);
-  // const [isConfirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
-  // const [deleteCard, setDeleteCard] = useState('')
-  const [confirmDeletePopup, setConfirmDeletePopup] = useState({isOpen: false, id: ''})
+  const [confirmDeletePopup, setConfirmDeletePopup] = useState({ isOpen: false, id: '' });
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
@@ -48,6 +46,7 @@ function App() {
       console.log(err);
     });
   }, []);
+
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     if (isLiked) {
@@ -112,18 +111,15 @@ function App() {
   }
 
   function handleCardDelete(card) {
-    console.log(card);
-    setConfirmDeletePopup({ isOpen: true, id: card._id })
+    setConfirmDeletePopup({ isOpen: true, id: card._id });
   }
 
   function handleCardDeleteConfirm() {
-    console.log(confirmDeletePopup);
     if (confirmDeletePopup.isOpen && confirmDeletePopup.id) {
       api.deleteCard(confirmDeletePopup.id).then(() => {
         setCards(cards.filter((c) => {
           return c._id !== confirmDeletePopup.id;
         }));
-        console.log("Successfull deletion")
         handleCloseAllModals();
       }).catch((err) => {
         console.log(err);
@@ -141,28 +137,29 @@ function App() {
       console.log(err);
     });
   }
+
   function handleSignOut() {
     localStorage.removeItem('token');
     setLoggedIn(false);
     history.push('/signin');
   }
+
   function handleLogin() {
     setLoggedIn(true);
   }
+
   function handleTokenCheck() {
     if (localStorage.getItem('token')) {
       const token = localStorage.getItem('token');
-      console.log("checkToken", token)
       auth.checkToken(token).then((res) => {
         setLoggedIn(true);
         setUserData({ password: res.password, email: res.email })
-
       }).then(() => {
         history.push('/')
       });
     }
-
   }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
