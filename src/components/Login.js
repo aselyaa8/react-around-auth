@@ -18,16 +18,7 @@ class Login extends React.Component {
     if (!this.state.email || !this.state.password) {
       return;
     }
-    auth.authorize(this.state.email, this.state.password)
-      .then((data) => {
-        if (data.token) {
-          this.setState({ email: '', password: '' }, () => {
-            this.props.handleLogin();
-            this.props.history.push('/');
-          })
-        }
-      })
-      .catch(err => console.log(err));
+    this.props.handleAuthorize(this.state.email, this.state.password);
   }
 
   handleChange(e) {

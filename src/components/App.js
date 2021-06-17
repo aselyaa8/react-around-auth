@@ -14,6 +14,9 @@ import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import ConfirmPopup from './ConfirmPopup';
+import InfoTooltip from './InfoTooltip';
+import success from '../images/success.svg';
+import failed from '../images/union.svg';
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -24,8 +27,8 @@ function App() {
   const [confirmDeletePopup, setConfirmDeletePopup] = useState({ isOpen: false, id: '' });
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({});
   const history = useHistory();
+  const [registerStatus, setRegisterStatus] = useState({ registered: false, showModal: false });
 
   useEffect(() => {
     handleTokenCheck();
@@ -149,15 +152,56 @@ function App() {
   }
 
   function handleTokenCheck() {
-    if (localStorage.getItem('token')) {
-      const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    if (token) {
       auth.checkToken(token).then((res) => {
         setLoggedIn(true);
-        setUserData({ password: res.password, email: res.email })
+        console.log(res)
       }).then(() => {
-        history.push('/')
+        history.push('/');
       });
     }
+  }
+
+  function handleAuthorize(email, password) {
+    auth.authorize(email, password)
+      .then((data) => {
+        if (data.token) {
+          handleLogin();
+          history.push('/');
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
+
+  function handleRegister(email, password) {
+    auth.register(email, password).then((res) => {
+      if (res) {
+        setRegisterStatus({ registered: true, showModal: true });
+      } else {
+        setRegisterStatus({ showModal: true });
+      }
+    });
+  }
+
+  function handleInfoTooltipClose() {
+    if (registerStatus.showModal && registerStatus.registered) {
+      setRegisterStatus({ showModal: false });
+      history.push('/signin');
+    } else {
+      setRegisterStatus({ showModal: false });
+    }
+  }
+
+  let InfoTooltipMessage;
+  let InfoTooltipImgSrc;
+  if (registerStatus.showModal && registerStatus.registered) {
+    InfoTooltipMessage = 'Success! You have now been registered.'
+    InfoTooltipImgSrc = success;
+  } else if (registerStatus.showModal) {
+    InfoTooltipMessage = 'Oops, something went wrong! Please try again.'
+    InfoTooltipImgSrc = failed;
   }
 
   return (
@@ -166,10 +210,11 @@ function App() {
         <Header handleSignOut={handleSignOut} />
         <Switch>
           <Route path="/signup">
-            <Register />
+            <Register handleRegister={handleRegister} />
+            {registerStatus.showModal && <InfoTooltip onClose={handleInfoTooltipClose} message={InfoTooltipMessage} imgSrc={InfoTooltipImgSrc} />}
           </Route>
           <Route path="/signin">
-            <Login handleLogin={handleLogin} handleTokenCheck={() => handleTokenCheck()} />
+            <Login handleLogin={handleLogin} handleAuthorize={handleAuthorize} />
           </Route>
           <ProtectedRoute path="/" loggedIn={loggedIn}
             onEditProfile={handleEditProfileClick}
