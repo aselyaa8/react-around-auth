@@ -154,9 +154,8 @@ function App() {
   function handleTokenCheck() {
     const token = localStorage.getItem('token');
     if (token) {
-      auth.checkToken(token).then((res) => {
+      auth.checkToken(token).then(() => {
         setLoggedIn(true);
-        console.log(res)
       }).then(() => {
         history.push('/');
       });

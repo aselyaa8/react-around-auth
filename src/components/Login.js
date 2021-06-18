@@ -1,6 +1,5 @@
-import React, { useRef } from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import * as auth from '../utils/auth';
+import React from 'react';
+import { withRouter } from 'react-router-dom';
 
 class Login extends React.Component {
   constructor(props) {
